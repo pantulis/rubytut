@@ -453,3 +453,319 @@ Esto se usa un montón en Rails
                                :join_table => "posts_categories"
     end
 
+!SLIDE smaller
+
+# Ahora sí lo sabemos
+
+    def has_and_belongs_to_many(name, options = {}, &extension) 
+       ... 
+    end
+
+!SLIDE 
+
+# CONTROL DE FLUJO #
+
+!SLIDE
+
+## if ... then ... else ... end
+
+     @@@ ruby
+     if x < 5 then 
+        wadus
+     end
+
+     if x < 5 then
+        wadus
+     else
+        wudas
+     end
+
+!SLIDE  smaller
+
+## unless ... then ... else ... end
+
+    @@@ ruby
+    unless x > 5 then 
+       wudas
+    end
+
+    unless x > 5 then
+       wudas
+    else
+       wadus
+    end
+
+Es lo mismo que 
+    @@@ ruby
+    if x <= 4 then
+       wadus
+    else
+       wudas
+    end
+
+!SLIDE
+
+## one liners!
+
+    @@@ ruby
+    
+    wadus if x > 5 
+
+    wadus unless x.nil?
+
+!SLIDE
+
+## Pero if ... then .. else ... end son expresiones
+
+    @@@ ruby
+    a = if x > 5 then 
+         4
+        else
+         20
+        end
+
+    x = unless y > 15 then 4 else 10 end
+
+!SLIDE smaller
+
+## Operador ternario para programadores trastornados
+
+     @@@ ruby
+
+     a = (x > 5) ? 20 : 50
+
+     puts "Tienes #{x} #{x==1 ? 'punto' : 'puntos'}"
+
+
+No abusar de esto! Se complica y se vuelve ilegible fácilmente! 
+
+!SLIDE 
+
+## Selección múltiples
+
+    @@@ ruby
+    case expresion 
+      when value1
+         wadus1
+      when value2
+         wadus2
+      else 
+         wadus3
+    end
+       
+!SLIDE
+
+## Selección múltiple con cadenas
+   
+   Podemos poner expresiones regulares
+
+    @@@ ruby     
+
+    str = "Esta es una cadena"
+    case str
+      when "estono" 
+         "Caso 1"
+      when "estotampoco"
+         "Caso 2"
+      when /cadena/
+         "Caso 3"
+      else
+         "Nada de lo anterior"
+    end
+
+!SLIDE
+       
+## Selección múltiple con números
+  
+  Podemos poner rangos
+
+     @@@ ruby
+     
+     dado = rand(6)   # va de 0 a 5!
+     puts case dado+1 
+      when 1..3
+        "Mala suerte, te ha salido un #{dado}"
+      when 4..5
+        "Salio un #{dado}"
+      when 6
+        "La repera! Te salió un #{dado}"
+      end
+
+!SLIDE
+
+## Iteración en una lista de elementos 1
+
+while
+
+      @@@ ruby
+      list = %w(pantuis natali vieron ivlo)
+
+      i=0
+
+      while i<list.size do
+         puts list[i]
+         i=i+1
+      end
+      
+
+!SLIDE
+
+## Iteración en una lista de elementos 2
+
+until
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      i=0
+
+      until i==list.size do
+         puts list[i]
+         i=i+1
+      end
+
+
+!SLIDE
+
+## Iteración en una lista de elementos 3
+
+while en modificador
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      i=0
+
+      begin 
+         puts list[i]
+         i=i+1
+      end while i< list.size
+
+!SLIDE
+
+## Iteración en una lista de elementos 4
+
+until en modificador
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      i=0
+
+      begin 
+         puts list[i]
+         i=i+1
+      end until i== list.size
+
+
+!SLIDE
+
+## Iteración en una lista de elementos 5
+
+bucle for sobre el elemento
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      for i in list
+          puts i
+      end
+
+
+!SLIDE
+
+## Iteración en una lista de elementos 6
+
+Array#each
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      list.each do |x|
+        puts x
+      end
+
+!SLIDE
+
+## Iteración en una lista de elementos 7
+
+loop con while
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      i=0
+      n=list.size -1
+
+      loop do 
+         puts list[i]
+         i+=1
+         break if i > n
+      end
+
+!SLIDE
+
+## Iteración en una lista de elementos 8
+
+loop con until
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      i=0
+      n=list.size
+
+      loop do 
+         puts list[i]
+         i+=1
+         break unless i <= n
+      end
+
+!SLIDE
+## Iteración en una lista de elementos 9
+
+iterando con 'times'
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      n=list.size
+
+      n.times do |i|
+       print list[i]
+      end
+
+!SLIDE
+## Iteración en una lista de elementos 10
+
+iterando con upto
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      n=list.size
+
+      0.upto(n) do |i|
+       print list[i]
+      end
+
+!SLIDE
+## Iteración en una lista de elementos 11
+
+for con un rango
+
+      @@@ ruby
+      list = %w(pantulis natali vieron ivlo)
+
+      n=list.size-1
+
+      for i in 0..n do 
+        puts list[i]
+      end
+
+
+ 
+
+
+
+
