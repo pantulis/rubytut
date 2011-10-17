@@ -763,9 +763,158 @@ for con un rango
         puts list[i]
       end
 
+!SLIDE 
 
- 
+#  BLOQUES
 
 
+!SLIDE smaller
+
+# ¿Qué hace Array#map con el bloque? 
+
+      @@@ ruby
+      
+      mi_array = [1,2,3,4]
+
+      mi_array.map!  do |x|
+        x*2 
+      end
+
+* El bloque es un parámetro que se pasa a la función
+* |x| es el parámetro del propio bloque
+* En el bloque podemos usar el parámetro como si fuera una variable
+* map! se encarga de que este parametro vaya siendo cada elemento del array
+
+!SLIDE smaller
+
+# Con yield podemos implementar nuestra propia version 
+
+      @@@ ruby
+
+      class Array
+        def map!
+          i = 0
+          self.each do |n|
+            self[i] = yield(n)   # yield ejecuta el bloque como si fuese
+                                 # una funcion
+            i = i + 1
+          end
+        end
+      end
+
+!SLIDE smaller
+
+# Esto nos permite crear funciones muy poderosas
+
+    @@@ ruby
+    def tag(tag) 
+      puts "<#{tag.to_s}>"
+        yield
+      puts "</#{tag.to_s}>"
+    end
+
+    tag(:html) do
+      tag(:head) do
+        puts "<meta href='wadus'>"
+      end
+      tag(:body) do
+        tag(:h1) do
+          puts "Esta es la cabecera"
+        end
+        tag(:p) do
+          puts "El párrafo"
+        end
+      end
+    end
+
+!SLIDE smaller
+
+    @@@ ruby
+    ruby tmp/ruby_tags.rb
+    <html>
+    <head>
+    <meta href='wadus'>
+    </head>
+    <body>
+    <h1>
+    Esta es la cabecera
+    </h1>
+    <p>
+    El párrafo
+    </p>
+    </body>
+    </html>
+
+!SLIDE smaller
+
+## También podía haber sido con llaves
+
+    @@@ ruby
+    tag(:html) do
+      tag(:head) {  puts "<meta href='wadus'>" }
+      tag(:body) do
+        tag(:h1) {  puts "Esta es la cabecera"}
+        tag(:p) {  puts "El párrafo" }
+      end
+    end
+
+* La convención es usar una llave para una sola linea
+* do..end cuando se usan varias lineas
 
 
+!SLIDE smaller
+
+## En Rails se usa por todas partes.
+
+## En helpers:
+
+    @@@ ruby
+    <% form_for @person, :url => { :action => "update" } do |person_form|%<
+       ...
+    <% end %>
+
+## En modelos
+
+    @@@ ruby
+    class Organization < ActiveRecord::Base
+      has_many :people do
+       def find_active
+        find(:all, :conditions => ["active = ?", true])
+       end
+      end
+    end
+
+
+    organization.people.find_active()
+
+
+!SLIDE 
+
+## Más ejemplos de bloques
+
+    @@@ ruby
+    def dosveces
+      yield 
+      yield
+    end
+
+    dosveces { puts "Hola" }
+
+!SLIDE
+
+## Los bloques son cierres (CLOSURES)
+
+    @@@ ruby
+    def dosveces_traidora
+      x = 1000
+      yield
+      yield
+      puts "x vale : #{x}"
+    end
+
+    x = 5
+    dosveces_traidora { x += 1 }
+    puts "x vale: #{x}"
+    
+    
+* ¿Cuánto vale x en cada puts?
