@@ -953,7 +953,7 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
       puts "Ya casi estamos!"
       @b.call
 
-!SLIDE 
+!SLIDE smaller
 
 ## Limitaciones con los bloques
 
