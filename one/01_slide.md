@@ -918,3 +918,102 @@ for con un rango
     
     
 * ¿Cuánto vale x en cada puts?
+
+
+!SLIDE 
+
+## Nombres de bloques
+
+Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un nombre (con &)
+
+     @@@ ruby
+     def dosveces
+       yield 
+       yield
+     end
+
+     def cuatro_veces(&block)
+       dos_veces(&block)
+       dos_veces(&block)
+     end            
+
+!SLIDE
+
+## Los bloques con nombre son funciones anónimas
+
+      @@@ ruby
+      
+      
+      def guardame_luego(&block)
+        @b = block
+      end
+
+
+      guardame_luego { puts "Hola!" }
+      puts "Ya casi estamos!"
+      @b.call
+
+!SLIDE 
+
+## Limitaciones con los bloques
+
+* Una función sólo puede recibir un bloque como parámetro
+
+       @@@ ruby
+       def funcion_que_no_funciona(&bloque1, &bloque2)
+
+       end
+
+       funcion_que_no_funciona {|x| puts "Hola"} {|y| puts "Adios"}
+
+!SLIDE 
+
+# ¿Ya hemos acabado con los bloques? 
+
+
+# NO!!!
+
+!SLIDE 
+
+## La auténtica esencia de los bloques: ¡también son objetos!
+
+      @@@ ruby
+      
+      def guardame_luego(&block)
+        @b = Proc.new(&block)
+      end
+
+      guardame_luego { puts "Hola!" }
+      puts "Ya casi estamos!"
+      @b.call
+
+* La misteriosa clase Proc!
+
+!SLIDE 
+
+## Ahora ya podemos definir funciones anónimas al vuelo, sin bloques
+
+      @@@ ruby
+
+      @b= Proc.new {puts "Wadus!"}
+
+      @b.call
+
+* Hemos hecho lo mismo que antes pero sin usar bloques
+
+!SLIDE 
+
+# PERO Proc.new TIENE MÁS AMIGOS
+
+!SLIDE
+
+        @@@ ruby
+        @b = Proc.new {puts "Wadus!"}
+        @c = proc {puts "wadus!"}
+        @d = lambda {puts "wadus!"}
+
+        @b.call
+        @c.call
+        @d.call
+        
+
