@@ -953,7 +953,7 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
       puts "Ya casi estamos!"
       @b.call
 
-!SLIDE smaller
+!SLIDE 
 
 ## Limitaciones con los bloques
 
@@ -1003,7 +1003,7 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
 
 !SLIDE 
 
-# PERO Proc.new TIENE MÁS AMIGOS
+# pero Proc.new tiene más compinches!
 
 !SLIDE
 
@@ -1016,4 +1016,10 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
         @c.call
         @d.call
         
+* La diferencia es que no podemos hacer return dentro de un Proc.new
+* En lambda sí
+
+
+
+
 
