@@ -1020,6 +1020,464 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
 * En lambda sí
 
 
+!SLIDE 
+
+# Orientación a Objetos
+
+!SLIDE
+
+* La orientación a objetos es una forma de modelar el mundo real
+* En el mundo real estamos rodeados de cosas que disponen de ciertos atributos
+* Decimos que todas las cosas que tienen los mismos atributos son de la misma clase
+
+!SLIDE 
+* Natalí tiene nombre y apellidos
+* Juan tiene nombre y apellidos
+* Iván tiene nombre y apellidos
+* Javi tiene nombre y apellidos
+
+* Las **personas** tienen nombre y apellidos
+
+!SLIDE smaller
+
+    @@@ ruby
+
+    class Persona 
+   
+    end 
+
+    natali = Persona.new     # Persona.new es el constructor
+    juan = Persona.new
+    ivan = Persona.new
+    javi = Persona.new
+
+
+* Pero ahora mismo estos objetos no hacen nada
+
+!SLIDE smaller
+ 
+* Para cargar datos en el constructor, usamos el método <code>initialize</code>
+
+      @@@ruby
+
+      class Persona
+         def initialize(nombre, apellidos)
+           @nombre = nombre
+           @apellidos = apellidos
+         end
+      end       
+
+      natali = Persona.new('Nelly Natalí', 
+                           'Sanchez Rodríguez')
+      juan = Persona.new('Juan', 'Lupión')
+      javi = Persona.new('Javier', 'Sanchez-Marín')
+      ivlo = Persona.new('Ivan', 'Lopez')
+
+!SLIDE smaller
+
+# Cada objeto recuerda los valores de sus variables de instancia      
+
+
+     @@@ ruby
+     puts natali.inspect, juan.inspect, javi.inspect, ivlo.inspect
+
+     #<Persona:0x100138a98 @apellidos="Sanchez Rodríguez", 
+                           @nombre="Nelly Natalí">
+     #<Persona:0x100138a20 @apellidos="Lupión", 
+                           @nombre="Juan">
+     #<Persona:0x1001389a8 @apellidos="Sanchez-Marín", 
+                           @nombre="Javier">
+     #<Persona:0x100138930 @apellidos="Lopez", 
+                           @nombre="Ivan">
+
+* ¿Y para leer estos valores desde fuera?
+
+!SLIDE smaller
+
+       @@@ ruby
+
+       natali = Persona.new('Nelly Natalí', 
+                            'Sanchez Rodríguez')
+
+       puts natali.nombre
+
+# CATACROCKER!
+       
+       NoMethodError: undefined method ‘nombre’ 
+       for #<Persona:0x100139088>
+
+!SLIDE smaller
+
+* <code>@nombre</code> y <code>@apellidos</code> son variables de instancia
+* pero estas variables son internas
+* para recuperarlas, tenemos que definir métodos en nuestra clase
+
+!SLIDE smaller
+
+# Accesores 
+
+      @@@ruby
+      class Persona
+         def nombre
+           @nombre
+         end 
+
+         def apellidos
+           @apellidos
+         end
+
+         def initialize(nombre, apellidos)
+           @nombre = nombre
+           @apellidos = apellidos
+         end
+      end       
+      natali = Persona.new('Nelly Natalí', 
+                           'Sanchez Rodríguez')
+
+      puts natali.nombre
+      => Nelly Natalí
+     
+!SLIDE
+
+# ¿Y si quiero modificar los atributos del objeto después de haberlo creado?
+
+!SLIDE smaller
+
+      @@@ruby
+      class Persona
+         def nombre
+           @nombre
+         end 
+
+         def apellidos
+           @apellidos
+         end
+
+         def nombre=(str)
+           @nombre = str
+         end
+
+         def apellidos=(str)
+           @apellidos = str
+         end
+
+         def initialize(nombre, apellidos)
+           @nombre = nombre
+           @apellidos = apellidos
+         end
+      end       
+
+
+!SLIDE smaller
+
+       @@@ ruby
+
+      natali = Persona.new('Nelly Natalí', 
+                           'Sanchez Rodríguez')
+
+      puts natali.nombre
+      => 'Nelly Natalí'            
+      natali.nombre = 'Natali'   
+      puts natali.nombre
+      => 'Natali'
+
+!SLIDE smaller 
+
+# ¿Tenemos que hacer esto para cada variable de instancia que queramos exponer al mundo como atributo?
+
+
+      @@@ ruby
+      def nombre
+        @nombre
+      end 
+
+      def nombre=(str)
+        @nombre = str
+      end
+
+!SLIDE smaller
+
+       @@@ ruby
+       attr_reader :nombre, :apellidos
+       attr_writer :nombre, :apellidos
+
+!SLIDE smaller
+
+# <code>attr_accessor</code> lo pone aún más fácil
+
+       @@@ ruby
+       class Persona
+          attr_accessor :nombre, :apellidos
+
+          def initialize(nombre, apellidos)
+            @nombre = nombre
+            @apellidos = apellidos
+          end
+       end
+
+       ivan = Persona.new('Ivan', 'Lopez')
+       puts ivan.nombre
+       ivan.apellidos = 'López'
+       puts ivan.apellidos
+
+!SLIDE smaller
+
+       @@@ ruby
+       class Person
+          attr_accessor :name, :surname
+
+          def full_name
+            "#{@name} #{@surname}"
+          end
+
+          def initialize(nombre, apellidos)
+            @name = nombre
+            @surname = apellidos
+          end
+       end
+
+       juan = Person.new('juan','lupion')
+       puts juan.fullname
+
+# Principio de Acceso Universal 
+
+!SLIDE 
+
+# La herencia permite especializar las clases (ES-UN)
+
+
+- Un coche ES UN vehiculo
+- Un maquetador ES UNA persona
+- Un programador ES UNA persona
+
+!SLIDE smaller
+
+      @@@ ruby
+      class BackendEngineer < Person
+
+         def deploy
+           puts "cap deploy!"
+         end
+      end
+
+      class FrontendEngineer < Person
+
+         def slice_layers
+           puts "Clickity click"
+         end
+      end
+
+      javi = FrontendEngineer.new('javi','sanchez-marin')
+      juan = BackendEngineer.new('juan', 'lupion')
+
+      javi.slice_layers
+      juan.deploy
+
+!SLIDE smaller
+
+* Las clases BackendEngineer y FrontendEngineer son HIJAS DE Person 
+* BackendEngineer o FrontendEngineer no definen initialize
+* Si una clase no implementa un método, Ruby lo busca en su padre
+
+!SLIDE smaller
+
+      @@@ ruby
+      class BackendEngineer < Person
+         attr_accessor :favorite_language
+         def deploy
+           puts "cap deploy!"
+         end
+
+         def initialize(name, surname, language)
+            @favorite_language = language
+            super(name, surname)
+         end
+      end
+
+
+      juan = BackendEngineer.new('juan','lupion','ruby')
+      puts juan.full_name
+
+!SLIDE smaller
+
+* Las clases son dinámicas
+* Se pueden abrir y cerrar varias veces  durante la vida del programa
+
+      @@@ ruby
+      class Person
+        attr_accessor :name, :surname
+        def initialize(name, surname)
+          @name = name
+          @surname = surname
+        end
+      end
+
+      natali = Person.new('Nelly','Natali')
+
+      class Person
+        def full_name
+           "#{@name} #{@surname}"
+        end
+      end
+
+      puts natali.full_name
+     
+!SLIDE smaller
+
+* Las clases pueden definir métodos comunes a todas las instancias
+* No se invocan sobre una instancia concreta, sino sobre la clase
+* Se llaman métodos de clase
+
+      @@@ ruby
+      class Person
+       def self.salute
+         puts "Hola!"
+       end
+      end
+
+      javi = Person.new('Javi','Sanchez')
+      javi.salute
+    
+      => undefined method `salute' for #<Person:0x100175df8 @apellidos="sanchez", @nombre="javi"> (NoMethodError)
+
+      Person.salute
+      => "Hola!"
+
+!SLIDE smaller
+
+* También existen *variables de clase* que son vbles globales
+  compartidas entre todas las isntancias de una clase
+
+      @@@ruby
+      class Person
+        attr_accessor :name, :surname
+        @@count = 0 
+    
+        def initialize(name, surname)
+          @@count += 1
+          @name = name
+          @surname = surname
+        end
+
+        def self.count
+          @@count
+        end
+      end
+    
+      javi = Person.new('Javi','Sanchez')
+      Person.count
+      => 1
+      ivan = Person.new('Ivan','Lopez')
+      Person.count
+      => 2
+
+!SLIDE smaller
+
+* En los métodos de clase no podemos llamar a las variables de instancia
+    * Porque no los estamos llamando sobre una instancia concreta
+
+* En los métodos de instancia (sin <code>self</code>) **sí** podemos llamar a las variables de clase
+
+!SLIDE smaller
+
+# ¿Y para qué sirven los métodos de clase?
+
+!SLIDE smaller 
+
+* Para crear instancias (factoría)
+
+     * Ya conocemos una factoría: <code>Person#new</code>
+     * En ActiveRecord: <code>User.find_by_email('vieron@gmail.com')</code>
+
+!SLIDE smaller
+
+* Para modificar clases según se definen
+
+      @@@ ruby
+      module ActiveRecord 
+         class Base
+            def self.validates_presence_of
+                wadus wadus wadus...
+            end
+         end
+      end
+
+      class Person < ActiveRecord::Base
+
+         validates_presence_of :email
+
+      end
+      
+!SLIDE smaller
+
+* Para agrupar métodos similares y que no estén sueltos
+
+      @@@ ruby
+
+      class Mates
+         
+         def self.raiz_cuadrada(n)
+          ...
+         end
+     
+         def self.media(n)
+          ...
+         end
+      end
+
+      puts Mates.raiz_cuadrada(25)
+      puts Mates.media [1,2,3,4,5]
+
+* Con esto hemos creado una **librería**
+
+!SLIDE smaller
+
+* Cuando una clase recibe un método que no conoce
+* Eleva una excepción (NoMethodError)
+* Pero **podemos tomar el control**
+* Antes de elevar la excepción, ejecuta  <pre>method_missing</pre>
+          
+!SLIDE smaller
+
+      @@@ ruby
+
+      class Person
+         #... 
+
+         def method_missing(method)
+           puts "Ay, qué sofoco, no se hacer 
+                 #{method} me desmayo!"
+         end
+      end
+
+      juan = Person.new('juan','lupion')
+
+      juan.wadus
+
+      => Ay, qué sofoco, no se hacer wadus me desmayo!
+
+!SLIDE smaller
+
+* Rails usa method_missing por todas partes
+* Cómo define ActiveRecord estos métodos?
+
+      @@@ ruby
+      User.find_by_name_and_email(...)
+      User.find_by_email_and_name(...)
+      User.find_by_email_and_name_and_zipcode
+      User.find_or_create_by_email_and_name_and_...
+
+
+* Más información: http://sobrerailes.com/2007/04/29/finders-dinamicos-en-activerecord/
+
+!SLIDE smaller
+
+* Ejercicio!
+    * Programar una clase Dado
+    * Tirar tres dados mil veces
+    * Contar cuántas veces salen 3 seises (debería ser unas 5 veces)
 
 
 
+
+      
