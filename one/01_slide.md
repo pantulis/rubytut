@@ -1478,6 +1478,264 @@ Hasta ahora los bloques que hemos visto eran anónimos, pero pueden recibir un n
     * Contar cuántas veces salen 3 seises (debería ser unas 5 veces)
 
 
+!SLIDE  smaller
+
+# ¿Qué hacemos cuando el código crece?
+  
+
+* Separamos el código en clases que representan al mundo real
+* Separamos el código en diferentes ficheros
+  * Normalmente un fichero para cada clase
+
+!SLIDE  smaller
+
+# <code>require</code>
 
 
-      
+* Es la forma estándar de incluir un archivo desde otro
+
+
+      @@@ ruby
+	  # fichero ejercicio.rb 
+	
+      require 'cubilete'
+
+      cubilete  = Cubilete.new(:dados => 3)
+      cubilete.run(1000)
+      cubilete.analyze {|d1, d2, d3| 
+		(d1 == 6) && (d2 == 6) && (d3 == 6)
+	  }
+	
+!SLIDE smaller
+
+	@@@ ruby
+	# fichero cubilete.rb
+	
+	require 'dados'
+	
+	class Cubilete
+		def initialize(opts)
+			d1 = Dado.new()
+			d2 = Dado.new()
+			d3 = Dado.new()
+		end
+	end
+
+	# fichero dados.rb
+	
+	class Dado
+		...
+	end
+
+!SLIDE center smaller
+
+# Cómo queda el directorio
+
+![Dados](image01.png)
+
+* Pero aún podemos querer organizar mejor los ficheros
+* Por subdirectorios
+	* Para guardar cubilete.rb y dado.rb en un directorio <code>/lib</code>
+
+!SLIDE smaller image 
+
+# Puedo usar rutas en <code>require</code>
+
+![Dados_con_lib](image02.png)
+
+	@@@ ruby
+	# ejercicio.rb
+	require 'lib/cubilete'
+		
+	cubilete = Cubilete.new
+	cubilete.run(:times => 3000)
+	cubilete.analyze{|d1,d2,d3| (d1 == 6) && (d2 == 6) 
+		                        && (d3 == 6)}
+               
+!SLIDE smaller smaller
+
+# CATACROCKER!
+
+	@@@
+	./lib/cubilete.rb:1:in `require': no such file to load -- dado (LoadError)
+		from ./lib/cubilete.rb:1
+		from ejercicio.rb:1:in `require'
+		from ejercicio.rb:1
+             
+* <code>require 'lib/cubilete'</code> incluye el fichero cubilete dentro de
+ejercicio.rb, igual que si estuviese escrito ahí dentro
+* como cubilete.rb hace <code>require 'dado'</code> (sin lib), no lo encuentra en el dir actual
+
+!SLIDE smaller
+
+# ¿La solución? 
+
+	@@@ ruby
+	# lib/cubilete.rb
+	
+	require 'lib/dado'
+	class Cubilete 
+		...
+	end
+	
+* Con esto funciona... PERO HAY COSAS MAL
+
+!SLIDE smaller
+
+# Así no he construido realmente una funcionalidad de librería
+
+* Acoplamiento a varios niveles
+* No puedo incluir cubilete.rb desde un sitio que no sea su directorio padre
+* Y además el directorio tiene que llamarse lib o de lo contrario tengo que tocar cubilete.rb
+* Esto se solucionaría si pudiese mantener require 'dado' en cubilete.rb 
+	
+<strong>Concepto clave</strong> RUTA DE CARGA (Load Path)
+
+!SLIDE smaller
+
+# La variable mágica <code>$:</code>
+
+* Cuando hago <code>require 'wadus'</code> Ruby busca un fichero llamado wadus.rb (o wadus.so) en una serie de directorios predeterminados
+
+	  @@@ ruby
+	  ruby-1.8.7-head > $:
+ 	      => ["/lib/ruby/site_ruby/1.8",
+          "/ruby/lib/ruby/site_ruby/1.8/i686-darwin10.3.1",
+          "/ruby/lib/ruby/site_ruby", 
+          "/ruby/lib/ruby/vendor_ruby/1.8", 
+          "/ruby/lib/ruby/vendor_ruby/1.8/i686-darwin10.3.1",
+          "/ruby/lib/ruby/vendor_ruby",
+          "/ruby/lib/ruby/1.8",
+          "/ruby/lib/ruby/1.8/i686-darwin10.3.1", 
+          "."]
+	
+* El punto del final, es el directorio actual del fichero que hace el require
+	
+
+!SLIDE smaller
+
+* Manipulando <code>$:</code> puedo arreglar el problema anterior
+
+	  @@@ ruby
+	  # ejercicio.rb
+	  $: << './lib'
+	  require 'cubilete'
+	  ...
+		
+* Ahora cuando en <code>cubilete.rb</code> se haga <code>require 'dado'</code>, lo encontrará porque
+  
+	  @@@ ruby
+	  irb
+	  ruby-1.8.7-head > $: << './lib'
+	  => ["/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby/1.8",
+	      ... 
+	      "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/1.8/i686-darwin10.3.1", 
+	      ".", "./lib"]
+		
+* Pero no tiene sentido que la ruta la manipule ejercicio.rb
+	* Es código "cliente", la "librería" debería hacerlo por él
+
+		
+!SLIDE smaller
+
+![Dados_con_lib](image03.png)
+
+     @@@ ruby
+	 # ejercicio.rb
+	 require 'cubilete/init'
+	
+	 # cubilete/init.rb
+	 $:.unshift File.join(File.dirname(__FILE__),'./lib')
+	 require 'cubilete'
+	 require 'dado'
+	 
+	 # cubilete/lib/cubilete.rb
+	 class Cubilete
+	   ...
+	 end
+	 
+	 # cubilete/lib/dado.rb
+	 class Dado
+	   ...
+	 end
+	
+
+!SLIDE smaller
+
+	 @@@ ruby
+     # /Users/juan/repos/rubytuty/ejemplos/cubilete/init.rb
+     # File.dirname(__FILE__) == /Users/juan/../cubilete 
+     $:.unshift File.join(File.dirname(__FILE__),'./lib')
+     require 'cubilete'
+     require 'dado'
+
+	 
+* $:.unshift es igual que $: <<  pero añade por la cabeza
+* Añado las dependencias directamente en cubilete/init.rb
+* No hago require dentro de los ficheros de lib/
+* Puedo incluir cubilete/init.rb desde cualquier otro fichero de Ruby y funcionará bien
+* Los plugins, gemas y engines de Rails se basan en este mecanismo
+
+!SLIDE smaller
+
+# Curiosidad: require o load ?
+
+* <code>load</code> hace lo mismo que <code>require</code>
+* Incluye el fichero que se le pasa y ejecuta lo que haya 
+
+	  @@@ ruby
+	  # main.rb
+	  load 'included.rb'
+	  say_hello
+
+	  # included.rb
+	  puts "Included ha sido incluido"
+	  def say_hello
+		puts "Hello!"
+	  end
+	
+	  ruby main.rb
+	  Included ha sido incluido
+	  Hello!
+	
+!SLIDE smaller
+
+      @@@ ruby
+	  load 'included.rb'
+	  load 'included.rb'
+	  load 'included.rb'
+	  say_hello
+	
+	
+	  Included ha sido incluido
+	  Included ha sido incluido
+	  Included ha sido incluido
+   	  Hello!
+
+!SLIDE smaller
+
+	   @@@ ruby
+	   require 'included'
+	   require 'included'
+	   require 'included'
+	   say_hello
+	    
+	   Included ha sido incluido
+	   Hello!
+	
+!SLIDE smaller
+
+* <code>require</code> solo incluye UNA vez
+
+ 	  @@@ ruby
+  	  ruby-1.8.7-head > require 'included'
+	  Fichero incluido
+	   => true 
+	  ruby-1.8.7-head > require 'included'
+	   => false 
+	  ruby-1.8.7-head >
+	
+* En producción hace require, pero en desarrollo hace load
+* Así se carga el fichero cada vez sin reiniciar el servidor
+* Rails, Sinatra, Nanoc...
+
