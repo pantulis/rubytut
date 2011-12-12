@@ -1593,7 +1593,7 @@ ejercicio.rb, igual que si estuviese escrito ahí dentro
 
 !SLIDE smaller
 
-# La variable mágica <code>$:</code>
+# La variable mágica <code>$:</code> (o $LOAD_PATH)
 
 * Cuando hago <code>require 'wadus'</code> Ruby busca un fichero llamado wadus.rb (o wadus.so) en una serie de directorios predeterminados
 
@@ -1739,3 +1739,62 @@ ejercicio.rb, igual que si estuviese escrito ahí dentro
 * Así se carga el fichero cada vez sin reiniciar el servidor
 * Rails, Sinatra, Nanoc...
 
+!SLIDE smaller
+
+# Rubygems
+
+* Las gemas son librerías de código empaquetadas de cierta manera
+* Gem define una forma de descargar esas librerías desde un repo a nuestro equipo
+* Se usa incluyendo require 'rubygems'
+* rubygems gestiona una nueva lista de directorios
+	- Gem.path
+      * <small><code>["/Users/juan/.rvm/gems/ruby-1.8.7-head", "/Users/juan/.rvm/gems/ruby-1.8.7-head@global"] </code></small>
+	- Redefine 'require'
+	- Manipula $LOAD_PATH (o $:)
+	
+* Cuando hacemos require 'wadus'
+* Si wadus está en $LOAD_PATH, lo incluye (igual que antes)
+* Si en Gem.path existe el directorio 'wadus', añade wadus/lib al $LOAD_PATH
+
+!SLIDE smaller
+
+     @@@ ruby
+	ruby-1.8.7-head > pp $LOAD_PATH
+	["/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby/1.8/i686-darwin10.3.1",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby/1.8/i686-darwin10.3.1",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/1.8/i686-darwin10.3.1",
+	 "."]
+	 => nil 
+	ruby-1.8.7-head > require 'rubygems'
+	 => true 
+	ruby-1.8.7-head > require 'rake'
+	 => true 
+	ruby-1.8.7-head > pp $LOAD_PATH
+	["/Users/juan/.rvm/gems/
+	     ruby-1.8.7-head@global/gems/rake-0.8.7/lib",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby/1.8/i686-darwin10.3.1",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/site_ruby",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby/1.8/i686-darwin10.3.1",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/vendor_ruby",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/1.8",
+	 "/Users/juan/.rvm/rubies/ruby-1.8.7-head/lib/ruby/1.8/i686-darwin10.3.1",
+	 "."]
+	 => nil
+
+!SLIDE smaller
+
+# ¿Qué estructura debe tener el directorio de una gema?
+
+	* El directorio 'wadus' debe tener un subdirectorio 'lib'
+	* Dentro del cual hay un fichero wadus.rb
+	* Dentro del cual cuelga los directorios que queramos organizar
+	
+		
+	
